@@ -3,7 +3,11 @@ package com.sample.spring.controller;
 import com.sample.spring.model.Employee;
 import com.sample.spring.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.Optional;
 
 @RestController
 public class EmployeeController {
@@ -31,5 +35,22 @@ public class EmployeeController {
         employeeService.deleteById(id);
     }
 
+    @GetMapping("/employee/{id}")
+    public Optional<Employee> findById(@PathVariable Integer id){
+        return employeeService.findById(id);
+    }
 
+    @GetMapping("/employee/search")
+    public Iterable<Employee> findByQuery(@RequestParam(value = "first", required = false) String firstName, @RequestParam(value = "last", required = false) String lastName) {
+        if (!StringUtils.isEmpty(firstName) && !StringUtils.isEmpty(lastName)){
+            return employeeService.findByFirstNameAndLastName(firstName, lastName);
+        }else if(!StringUtils.isEmpty(firstName)){
+            return employeeService.findByFirstName(firstName);
+        }else if (!StringUtils.isEmpty(lastName)){
+            return employeeService.findByLastName(lastName);
+        }else{
+            return employeeService.findAll();
+        }
+
+    }
 }
